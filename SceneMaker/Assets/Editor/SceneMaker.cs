@@ -8,32 +8,66 @@ using System;
 
 public class SceneMaker : Editor
 {
-    //private Custom _custom;
     private Waypoints _waypoints;
 
     private void OnEnable()
     {
-        //_custom = (Custom)target;
         _waypoints = (Waypoints)target;
     }
 
     public override void OnInspectorGUI()
     {
-        DrawHeroParameters();
+        Grilla();
     }
 
-    private void DrawHeroParameters()
+    private void Grilla()
     {
-        _waypoints.countx = EditorGUILayout.IntField("GridX", _waypoints.countx);
-        _waypoints.countz = EditorGUILayout.IntField("GridY", _waypoints.countz);
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("GridX", GUILayout.MaxWidth(110f));
+        _waypoints.countx = EditorGUILayout.IntField(_waypoints.countx);
+        EditorGUILayout.EndHorizontal();
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("GridY", GUILayout.MaxWidth(110f));
+        _waypoints.countz = EditorGUILayout.IntField(_waypoints.countz);
+        EditorGUILayout.EndHorizontal();
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("Waypoint",GUILayout.MaxWidth(110f));
+        _waypoints.waypointPrefab = (GameObject)EditorGUILayout.ObjectField(_waypoints.waypointPrefab, typeof(GameObject),true);
+        EditorGUILayout.EndHorizontal();
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("Terrain", GUILayout.MaxWidth(110f));
+        _waypoints.terrain = (GameObject)EditorGUILayout.ObjectField(_waypoints.terrain, typeof(GameObject), true);
+        EditorGUILayout.EndHorizontal();
         if (GUILayout.Button("Grilla"))
             Grid();
+        if (GUILayout.Button("Borrar waypoints"))
+            ClearWaypoints();
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("Render Waypoints", GUILayout.MaxWidth(110f));
+        _waypoints.rende = EditorGUILayout.Toggle(_waypoints.rende);
+        EditorGUILayout.EndHorizontal();
+        
+        Renderer();
+
     }
 
     void Grid()
     {
-        _waypoints.CreateTarget(_waypoints.countx,_waypoints.countz);
+        _waypoints.CreateTarget(_waypoints.countx,_waypoints.countz,_waypoints.terrain);
     }   
+    void ClearWaypoints()
+    {
+        while (_waypoints.terrain.transform.Find("Waypoints").childCount != 0)
+            DestroyImmediate(_waypoints.terrain.transform.Find("Waypoints").GetChild(0).gameObject);
+    }
 
+    void Renderer()
+    {
+        if (_waypoints.terrain.transform.Find("Waypoints"))
+        {
+            foreach (Transform i in _waypoints.terrain.transform.Find("Waypoints"))
+            i.GetComponent<Renderer>().enabled = _waypoints.rende;
+        }
+    }
         
 }

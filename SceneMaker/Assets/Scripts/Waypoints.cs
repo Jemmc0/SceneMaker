@@ -6,8 +6,12 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class Waypoints : MonoBehaviour
 {
+    public GameObject waypointPrefab;
     public int GridX;
     public int GridY;
+    public GameObject terrain;
+    public bool rende;
+
     public float x, y, z;
     public float sizeX, sizeY, sizeZ, posY;
     public int countx, countz;
@@ -15,44 +19,47 @@ public class Waypoints : MonoBehaviour
     public int i, j;
     RaycastHit hit;
 
-    void Update()
+    public void CreateTarget(int countX, int countY, GameObject terrain)
     {
-                
-    }
-    public void CreateTarget(int countX, int countY)
-    {
-        for (int i = 0; i < gameObject.transform.childCount; i++)
-            DestroyImmediate(gameObject.transform.GetChild(i).gameObject,false);
+        if (!terrain.transform.Find("Waypoints"))
+        {
+            var way = new GameObject("Waypoints");
+            way.transform.parent = terrain.transform;
+        }
+
+        while (terrain.transform.Find("Waypoints").childCount != 0)
+            DestroyImmediate(terrain.transform.Find("Waypoints").GetChild(0).gameObject);
+
+        
 
 
-        sizeX = GetComponent<Renderer>().bounds.size.x;
-        sizeY= GetComponent<Renderer>().bounds.size.y;
-        sizeZ = GetComponent<Renderer>().bounds.size.z;
+        sizeX = terrain.GetComponent<Renderer>().bounds.size.x;
+        sizeY= terrain.GetComponent<Renderer>().bounds.size.y;
+        sizeZ = terrain.GetComponent<Renderer>().bounds.size.z;
         x = sizeX / countX;
         z = sizeZ / countY;
         
         testArray =new GameObject[countX+1,countY+1];
-        for (i = 0; i < countX+1; i++)
+        for (i = 0; i < countX + 1; i++)
         {
-            testArray[i , j] = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            testArray[i, j].transform.position = transform.position + new Vector3((-sizeX / 2) + (i * x), (sizeY / 2), (-sizeZ / 2) + (j * z));
+            testArray[i, j] = Instantiate(waypointPrefab);
+            testArray[i, j].AddComponent<MoveWaypoint>();
+            testArray[i, j].transform.position = terrain.transform.position + new Vector3((-sizeX / 2) + (i * x), (sizeY / 2), (-sizeZ / 2) + (j * z));
             testArray[i, j].transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-            testArray[i, j].transform.SetParent(gameObject.transform);
-            testArray[i, j].name = "Waypont "+ i + "," + j;
+            testArray[i, j].transform.SetParent(terrain.transform.Find("Waypoints"));
+            testArray[i, j].name = "Waypoint "+ i + "," + j;
             //testArray[i, j].GetComponent<MeshRenderer>().enabled = false;
             
 
             for (j = 1; j < countY+1; j++)
             {
-                testArray[i, j] = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                testArray[i, j].transform.position = transform.position + new Vector3((-sizeX / 2) + (i * x), (sizeY / 2), (-sizeZ / 2) + (j * z));
+                testArray[i, j] = Instantiate(waypointPrefab);
+                testArray[i, j].AddComponent<MoveWaypoint>();
+                testArray[i, j].transform.position = terrain.transform.position + new Vector3((-sizeX / 2) + (i * x), (sizeY / 2), (-sizeZ / 2) + (j * z));
                 testArray[i, j].transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-                testArray[i, j].transform.SetParent(gameObject.transform);
-                testArray[i, j].name = "Waypont "+ i + "," + j;
+                testArray[i, j].transform.SetParent(terrain.transform.Find("Waypoints"));
+                testArray[i, j].name = "Waypoint "+ i + "," + j;
                 //testArray[i, j].GetComponent<MeshRenderer>().enabled = false;
-
-
-
             }
             j =0 ;
         }
